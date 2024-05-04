@@ -5,8 +5,9 @@ import Post from "./Post";
 const posts = [
     {
         id: '1',
-        username: 'username1',
-        imageUrl: 'https://example.com/image1.jpg',
+        username: 'Alex',
+        imageUrl: 'https://t4.ftcdn.net/jpg/02/14/74/61/360_F_214746128_31JkeaP6rU0NzzzdFC4khGkmqc8noe6h.jpg',
+        image:'../../assets/Beaver-hero.jpg',
         likes: 1234,
         caption: 'This is the caption for post 1.',
         comments: [
@@ -18,8 +19,9 @@ const posts = [
     },
     {
         id: '2',
-        username: 'username2',
-        imageUrl: 'https://example.com/image2.jpg',
+        username: 'Beaver',
+        imageUrl: 'https://www.oregonzoo.org/sites/default/files/styles/16x9_fallback/public/2023-08/04-19-2021fb-172.jpg?h=82f92a78&itok=TlLsPDRv',
+        image:'https://cdn.pixabay.com/photo/2016/06/10/16/23/beaver-1448389_960_720.jpg',
         likes: 567,
         caption: 'This is the caption for post 2.',
         comments: [
@@ -35,14 +37,12 @@ const posts = [
 
 const PostList = () => {
     return (
-        <View>
             <FlatList
                 data={posts}
                 renderItem={({ item }) => (
                     <Post post={item}/>
                 )}
             />
-        </View>
     );
 };
 

@@ -1,9 +1,11 @@
 import React from 'react';
-import {View, Text, StyleSheet, TextInput, Pressable} from 'react-native'
+import {View, Text, StyleSheet, TextInput, Pressable, Alert, Platform} from 'react-native'
 import {useNavigation} from "@react-navigation/native";
 import Validator from 'email-validator'
 import {object, string} from "yup";
 import {Formik} from "formik";
+import * as firebase from "../../firebase";
+
 
 // todo: make red if not right
 const LoginForm = () => {
@@ -15,12 +17,26 @@ const LoginForm = () => {
         .required()
         .min(6, 'Your password has to have at least 8 characters')
     })
+
+    const onLogin = async (email, password) => {
+        try {
+            await firebase.auth().signInWithEmailAndPassword(email, password);
+            console.log('🔥 Fire base login successfully');
+        } catch (error) {
+            if(Platform.OS === 'web') {
+                alert(error.message)
+            } else {
+                Alert.alert(error.message);
+            }
+        }
+    }
+
     return (
         <View style={styles.container}>
             <Formik
                 initialValues={{email: '', password:''}}
                 onSubmit={(values) => {
-                    console.log(values)
+                    onLogin({values:{email, password}})
                 }}
                 validationSchema={LoginFormSchema}
                 validateOnMount={true}

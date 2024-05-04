@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet, Image, Pressable} from 'react-native'
 import AntDesign from "react-native-vector-icons/AntDesign";
 
-const Header = () => {
+const Header = ({navigation}) => {
     return (
         <View style={styles.container}>
             <Pressable>
@@ -12,7 +12,7 @@ const Header = () => {
                 />
             </Pressable>
             <View style={styles.iconsContainer}>
-                <Pressable>
+                <Pressable onPress={() => navigation.navigate('Post')}>
                     <AntDesign name="plussquareo" style={styles.icon} size={30} />
                 </Pressable>
                 <Pressable>

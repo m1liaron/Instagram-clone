@@ -27,6 +27,7 @@ const LoginForm = () => {
         } catch (error) {
             if(Platform.OS === 'web') {
                 alert(error.message)
+                console.log(error.message)
             } else {
                 Alert.alert(
                     'Wooo..',
@@ -41,7 +42,6 @@ const LoginForm = () => {
             <Formik
                 initialValues={{email: '', password:''}}
                 onSubmit={(values) => {
-                    console.log({values:{email, password}})
                     onLogin(values.email, values.password)
                 }}
                 validationSchema={LoginFormSchema}

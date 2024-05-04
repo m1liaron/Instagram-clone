@@ -5,8 +5,12 @@ import SearchScreen from "../screens/SearchScreen";
 import NewPostScreen from "../screens/NewPostScreen";
 import StoreScreen from "../screens/StoreScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+import LoginScreen from "../screens/LoginScreen";
+import SignupScreen from "../screens/SignupScreen";
+import {createNativeStackNavigator} from "@react-navigation/native-stack";
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator()
 
 const Navigator = () => (
     <Tab.Navigator
@@ -49,4 +53,13 @@ const Navigator = () => (
     </Tab.Navigator>
 );
 
+
+export const SignedOutStack = () => (
+    <Stack.Navigator
+        initialRouteName="Login"
+    >
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Signup" component={SignupScreen} options={{ headerShown: false }} />
+    </Stack.Navigator>
+)
 export default Navigator;

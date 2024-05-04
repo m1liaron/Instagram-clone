@@ -1,11 +1,25 @@
 import React from 'react';
 import {View, Text, StyleSheet, Image, Pressable} from 'react-native'
 import AntDesign from "react-native-vector-icons/AntDesign";
-
+import {app} from '../../firebase'
+import { getAuth, signOut } from "firebase/auth";
 const Header = ({navigation}) => {
+
+    const onLogOut = () => {
+        const auth = getAuth(app);
+        signOut(auth).then(() => {
+            // Sign-out successful.
+            navigation.navigate('Login')
+            console.log('You successfuly log out')
+        }).catch((error) => {
+            // An error happened.
+            console.log(error.message)
+        });
+    }
+
     return (
         <View style={styles.container}>
-            <Pressable>
+            <Pressable onPress={onLogOut}>
                 <Image
                     style={styles.logo}
                     source={require('../../assets/instagram-logo-white.png')}

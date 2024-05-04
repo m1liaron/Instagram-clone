@@ -5,8 +5,7 @@ import Validator from 'email-validator'
 import {object, string} from "yup";
 import {Formik} from "formik";
 import { app, db } from "../../firebase";
-import { collection, getDocs } from 'firebase/firestore'
-
+import { addDoc, collection } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword} from 'firebase/auth'
 
 // todo: make red if not right
@@ -21,22 +20,17 @@ const SignUpForm = () => {
             .min(6, 'Your password has to have at least 8 characters')
     })
 
-    const getUsersData = async () => {
-        const usersRef = collection(db, 'users');
-        const usersSnapshot = await getDocs(usersRef);
-        const usersData = usersSnapshot.docs.map(doc => doc.data());
-        return usersData;
-    }
-
-    getUsersData().then(response => {
-        console.log(response)
-    })
-
-    const onSignup= async (email, password) => {
+    const onSignup= async (email, password, username) => {
         try {
             const auth = getAuth(app);
             const authUser = await createUserWithEmailAndPassword(auth, email, password)
             console.log('🔥 Firebase signup successfully');
+            await addDoc(collection(db, 'users'), {
+                owner_uid: authUser.user.uid,
+                username,
+                email: authUser.user.email,
+                profile_picture: await getRandomProfilePicture()
+            });
         } catch (error) {
             if(Platform.OS === 'web') {
                 alert(error.message)
@@ -50,9 +44,9 @@ const SignUpForm = () => {
     }
 
     const getRandomProfilePicture = async () => {
-        const response = await fetch('https://random.me/api');
+        const response = await fetch('https://randomuser.me/api');
         const data = await response.json();
-        return data.result[0].picture.large
+        return data.results[0].picture.large
     }
 
     return (
@@ -60,8 +54,8 @@ const SignUpForm = () => {
             <Formik
                 initialValues={{email: '', username:'', password:''}}
                 onSubmit={(values) => {
-                    const {email, password} = values
-                    onSignup(email, password)
+                    const {email, password, username} = values
+                    onSignup(email, password, username)
                 }}
                 validationSchema={LoginFormSchema}
                 validateOnMount={true}

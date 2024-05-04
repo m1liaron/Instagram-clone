@@ -1,20 +1,18 @@
 import React from 'react';
 import {View, Text, StyleSheet, Pressable} from 'react-native'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { useNavigation } from '@react-navigation/native';
 import FormikPostUpLoader from "./FormikPostUploader";
 
-const AddNewPost = () => {
+const AddNewPost = ({ navigation}) => {
     return (
         <View style={styles.container}>
-            <Header/>
-            <FormikPostUpLoader/>
+            <Header navigation={navigation}/>
+            <FormikPostUpLoader navigation={navigation}/>
         </View>
     );
 };
 
-const Header = () => {
-    const navigation = useNavigation();
+const Header = ({ navigation }) => {
     return (
         <View style={styles.headerContainer}>
             <Pressable onPress={() => navigation.goBack()}>

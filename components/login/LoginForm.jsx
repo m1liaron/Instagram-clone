@@ -4,8 +4,9 @@ import {useNavigation} from "@react-navigation/native";
 import Validator from 'email-validator'
 import {object, string} from "yup";
 import {Formik} from "formik";
-import * as firebase from "../../firebase";
+import {app} from "../../firebase";
 
+import { getAuth, signInWithEmailAndPassword} from 'firebase/auth'
 
 // todo: make red if not right
 const LoginForm = () => {
@@ -20,13 +21,17 @@ const LoginForm = () => {
 
     const onLogin = async (email, password) => {
         try {
-            await firebase.auth().signInWithEmailAndPassword(email, password);
+            const auth = getAuth(app);
+            await signInWithEmailAndPassword(auth, email, password)
             console.log('🔥 Fire base login successfully');
         } catch (error) {
             if(Platform.OS === 'web') {
                 alert(error.message)
             } else {
-                Alert.alert(error.message);
+                Alert.alert(
+                    'Wooo..',
+                    error.message + '\n\n'
+                );
             }
         }
     }
@@ -36,7 +41,8 @@ const LoginForm = () => {
             <Formik
                 initialValues={{email: '', password:''}}
                 onSubmit={(values) => {
-                    onLogin({values:{email, password}})
+                    console.log({values:{email, password}})
+                    onLogin(values.email, values.password)
                 }}
                 validationSchema={LoginFormSchema}
                 validateOnMount={true}

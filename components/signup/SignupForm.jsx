@@ -1,9 +1,13 @@
 import React from 'react';
-import {View, Text, StyleSheet, TextInput, Pressable} from 'react-native'
+import {View, Text, StyleSheet, TextInput, Pressable, Platform, Alert} from 'react-native'
 import {useNavigation} from "@react-navigation/native";
 import Validator from 'email-validator'
 import {object, string} from "yup";
 import {Formik} from "formik";
+import { app, db } from "../../firebase";
+import { collection, getDocs } from 'firebase/firestore'
+
+import { getAuth, createUserWithEmailAndPassword} from 'firebase/auth'
 
 // todo: make red if not right
 const SignUpForm = () => {
@@ -16,12 +20,48 @@ const SignUpForm = () => {
             .required()
             .min(6, 'Your password has to have at least 8 characters')
     })
+
+    const getUsersData = async () => {
+        const usersRef = collection(db, 'users');
+        const usersSnapshot = await getDocs(usersRef);
+        const usersData = usersSnapshot.docs.map(doc => doc.data());
+        return usersData;
+    }
+
+    getUsersData().then(response => {
+        console.log(response)
+    })
+
+    const onSignup= async (email, password) => {
+        try {
+            const auth = getAuth(app);
+            const authUser = await createUserWithEmailAndPassword(auth, email, password)
+            console.log('🔥 Firebase signup successfully');
+        } catch (error) {
+            if(Platform.OS === 'web') {
+                alert(error.message)
+            } else {
+                Alert.alert(
+                    'Wooo..',
+                    error.message + '\n\n'
+                );
+            }
+        }
+    }
+
+    const getRandomProfilePicture = async () => {
+        const response = await fetch('https://random.me/api');
+        const data = await response.json();
+        return data.result[0].picture.large
+    }
+
     return (
         <View style={styles.container}>
             <Formik
                 initialValues={{email: '', username:'', password:''}}
                 onSubmit={(values) => {
-                    console.log(values)
+                    const {email, password} = values
+                    onSignup(email, password)
                 }}
                 validationSchema={LoginFormSchema}
                 validateOnMount={true}

@@ -1,4 +1,4 @@
-import Navigator, {SignedOutStack} from "./Navigator";
+import Navigator, {MainNavigator, SignedOutStack} from "./Navigator";
 import {useEffect, useState} from "react";
 import {app} from "../firebase";
 
@@ -7,18 +7,13 @@ import { getAuth } from 'firebase/auth'
 const AuthNavigation = () => {
     const [currentUser, setCurrentUser] = useState(null);
 
-    const userHandler = user => user ? setCurrentUser(user) : null
-
-    useEffect(
- () => {
+    useEffect(() => {
         const auth = getAuth(app);
-        return auth.onAuthStateChanged(user => userHandler(user))
-    }, []);
+        const unsubscribe = auth.onAuthStateChanged(user => setCurrentUser(user));
 
-    return (
-        <>
-            {currentUser ? <Navigator/> : <SignedOutStack/>}
-        </>
-    )
+        return unsubscribe; // Cleanup subscription
+    }, []); // Empty dependency array ensures useEffect only runs once
+
+    return currentUser ? <Navigator /> : <SignedOutStack />;
 }
 export  default  AuthNavigation

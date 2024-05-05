@@ -5,7 +5,7 @@ import Validator from 'email-validator'
 import {object, string} from "yup";
 import {Formik} from "formik";
 import { app, db } from "../../firebase";
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, setDoc, doc } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword} from 'firebase/auth'
 
 // todo: make red if not right
@@ -25,7 +25,9 @@ const SignUpForm = () => {
             const auth = getAuth(app);
             const authUser = await createUserWithEmailAndPassword(auth, email, password)
             console.log('🔥 Firebase signup successfully');
-            await addDoc(collection(db, 'users'), {
+
+            const userDocRef = doc(db, 'users', authUser.user.email);
+            await setDoc(userDocRef, {
                 owner_uid: authUser.user.uid,
                 username,
                 email: authUser.user.email,

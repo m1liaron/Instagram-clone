@@ -3,71 +3,120 @@ import {View, Text, StyleSheet, Image, Pressable, FlatList} from 'react-native'
 import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Fontisto from "react-native-vector-icons/Fontisto";
+import {getAuth} from "firebase/auth";
+import {db} from "../../firebase";
+import {collection, arrayUnion, arrayRemove, doc, updateDoc} from "firebase/firestore";
 
-const Post = (post) => {
+const Post = ({post}) => {
+
+    const handleLike = (post) => {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        const currentLikesStatus = !post.likes_by_users.includes(user.email);
+
+        const postRef = doc(db, 'users', post.owner_email, 'posts', post.id);
+
+        updateDoc(postRef, {
+            likes_by_users: currentLikesStatus ? arrayUnion(user.email) : arrayRemove(user.email)
+        }).then(() => {
+            console.log('Document updated');
+        }).catch(error => {
+            console.error('Error updating document: ', error);
+        });
+    };
+
     return (
         <View style={{marginBottom:30}}>
             <PostHeader post={post} />
             <PostImage post={post}/>
 
             <View style={{marginHorizontal: 15, marginTop: 10}}>
-                <PostFooter post={post}/>
+                <PostFooter post={post} handleLike={handleLike}/>
             </View>
         </View>
     );
 };
 
-const PostHeader = ({post: {post} }) => (
-    <View style={{justifyContent:'space-between', flexDirection:'row'}}>
-        <View style={styles.headerContainer}>
-            <Image style={styles.avatar} source={post.imageUrl}/>
-            <Text style={styles.text}>{post.username}</Text>
+const PostHeader = ({post}) => {
+    return (
+        <View style={{justifyContent:'space-between', flexDirection:'row'}}>
+            <View style={styles.headerContainer}>
+                <Image style={styles.avatar} source={post.profile_picture}/>
+                <Text style={styles.text}>{post.user}</Text>
+            </View>
+            <Text style={styles.text}>...</Text>
         </View>
-        <Text style={styles.text}>...</Text>
-    </View>
-)
+    )
+}
 
-const PostImage = ({post: {post}}) => (
+const PostImage = ({post}) => (
     <View style={{width:'100%', height: 450}}>
         <Image
             style={{height: '100%', resizeMode: 'cover'}}
-            source={{uri: post.image}}
+            source={{uri: post.imageUrl}}
         />
     </View>
 )
 
-const PostFooter = ({post: {post}}) => {
+const PostFooter = ({handleLike, post}) => {
     return(
         <View>
             <View style={styles.iconsList}>
                 <View style={styles.iconsContainer}>
-                    <AntDesign name="hearto" style={styles.icon} color="#fff" size={20}/>
+                    <Pressable onPress={() => handleLike(post)}>
+                        {post.likes_by_users.includes(post.owner_email) ? (
+                            <AntDesign name='heart' style={styles.icon} color='red' size={20}/>
+                        ) : (
+                            <AntDesign name="hearto" style={styles.icon} color='#fff' size={20}/>
+                        )}
+                    </Pressable>
                     <FontAwesome name="comment-o" style={styles.icon} color="#fff" size={20}/>
                     <FontAwesome name="send-o" style={styles.icon} color="#fff" size={20}/>
                 </View>
-                <Fontisto name="favorite" color="#fff" size={20}/>
+                    <Fontisto name="favorite" color='#fff' size={20}/>
             </View>
             <View>
-                <Text style={styles.footerText}>{post.likes} likes</Text>
-                <Text style={styles.footerText}>{post.caption}</Text>
+                <Text style={styles.footerText}>{post.likes_by_users.length.toLocaleString('en')} likes</Text>
+                <Text style={styles.footerText}>{post.user}  {post.caption}</Text>
             </View>
             <View>
                 <Pressable>
-                    <Text style={{...styles.text, color:'gray'}}>View all {post.comments.length} comments</Text>
+                    <CommentsSection post={post}/>
                 </Pressable>
-                <FlatList
-                    data={post.comments}
-                    renderItem={({ item }) => (
-                        <View>
-                            <Text style={styles.footerText}>{item.username} {item.text}</Text>
-                        </View>
-                    )}
-                    keyExtractor={(item, index) => index.toString()}
-                />
+                {post.comments.length ? (
+                    <Text>No comments</Text>
+                ) : (
+                    <Comments post={post}/>
+                )}
             </View>
         </View>
     )
 }
+
+const CommentsSection = ({post}) => (
+        <View>
+            {!!post.comments.length && (
+                <Text style={styles.text}>
+                    {post.comments.length > 1 ? ' all' : ''} {post.comments.length}
+                    {post.comments.length > 1 ? 'comments' : 'comment'}
+                </Text>
+            )}
+        </View>
+    )
+
+const Comments = ({post}) => (
+    <View>
+        <FlatList
+            data={post.comments}
+            renderItem={({ item }) => (
+                <View>
+                    <Text style={styles.footerText}>{item.username} {item.text}</Text>
+                </View>
+            )}
+            keyExtractor={(item, index) => index.toString()}
+        />
+    </View>
+)
 
 const styles = StyleSheet.create({
     headerContainer:{

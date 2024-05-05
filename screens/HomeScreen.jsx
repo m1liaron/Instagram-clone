@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {StyleSheet, SafeAreaView} from 'react-native'
 import Header from "../components/home/Header";
 import Stories from "../components/home/Stories";

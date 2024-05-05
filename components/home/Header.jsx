@@ -8,11 +8,8 @@ const Header = ({navigation}) => {
     const onLogOut = () => {
         const auth = getAuth(app);
         signOut(auth).then(() => {
-            // Sign-out successful.
-            navigation.navigate('Login')
             console.log('You successfuly log out')
         }).catch((error) => {
-            // An error happened.
             console.log(error.message)
         });
     }

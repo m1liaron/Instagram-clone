@@ -19,7 +19,7 @@ const Stories = () => {
                                 source={item.imageSource}
                                 style={styles.storyImage}
                             />
-                            <Text style={styles.text}>{item.name.length > 11 ? item.name.slice(0, 10).toLowerCase() + '...' : item.name}</Text>
+                            <Text style={styles.text}>{item.name.length > 11 ? item.name.slice(0, 6).toLowerCase() + '...' : item.name}</Text>
                         </View>
                     )}
                     horizontal={true}
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
         width: 70,
         height: 70,
         borderRadius: 50,
-        marginLeft:3,
+        marginLeft:18,
         borderWidth: 3,
         borderColor: '#ff8501'
     },

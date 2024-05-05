@@ -8,6 +8,7 @@ import ProfileScreen from "../screens/ProfileScreen";
 import LoginScreen from "../screens/LoginScreen";
 import SignupScreen from "../screens/SignupScreen";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
+import AuthNavigation from "./AuthNavigation";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator()
@@ -52,6 +53,14 @@ const Navigator = () => (
         <Tab.Screen name="Profile" component={ProfileScreen}/>
     </Tab.Navigator>
 );
+
+export const MainNavigator = () => (
+    <Stack.Navigator
+        initialRouteName="Home"
+    >
+        <Stack.Screen name="Home" component={AuthNavigation} options={{ headerShown: false }} />
+    </Stack.Navigator>
+)
 
 
 export const SignedOutStack = () => (

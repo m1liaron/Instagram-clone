@@ -1,14 +1,30 @@
-import React from 'react';
-import {View, Text, StyleSheet, Image, Pressable, FlatList} from 'react-native'
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, Image, Pressable, FlatList, TextInput} from 'react-native'
 import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import {getAuth} from "firebase/auth";
 import {db} from "../../firebase";
 import {collection, arrayUnion, arrayRemove, doc, updateDoc} from "firebase/firestore";
+import {useAuthentication} from "../../hooks/useAuthentication";
 
 const Post = ({post}) => {
 
+    const addComment = (post, data) => {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        console.log(post)
+        console.log('add comment')
+        console.log('user', data)
+        const postRef = doc(db, 'users', post.owner_email, 'posts', post.id);
+        updateDoc(postRef, {
+            comments_by_users: arrayUnion(data)
+        }).then(() => {
+            console.log('Document updated');
+        }).catch(error => {
+            console.error('Error updating document: ', error);
+        });
+    }
     const handleLike = (post) => {
         const auth = getAuth();
         const user = auth.currentUser;
@@ -31,7 +47,7 @@ const Post = ({post}) => {
             <PostImage post={post}/>
 
             <View style={{marginHorizontal: 15, marginTop: 10}}>
-                <PostFooter post={post} handleLike={handleLike}/>
+                <PostFooter post={post} handleLike={handleLike} addComment={addComment}/>
             </View>
         </View>
     );
@@ -58,7 +74,7 @@ const PostImage = ({post}) => (
     </View>
 )
 
-const PostFooter = ({handleLike, post}) => {
+const PostFooter = ({handleLike, post, addComment}) => {
     return(
         <View>
             <View style={styles.iconsList}>
@@ -83,11 +99,7 @@ const PostFooter = ({handleLike, post}) => {
                 <Pressable>
                     <CommentsSection post={post}/>
                 </Pressable>
-                {post.comments.length ? (
-                    <Text>No comments</Text>
-                ) : (
-                    <Comments post={post}/>
-                )}
+                    <Comments post={post} addComment={addComment}/>
             </View>
         </View>
     )
@@ -95,28 +107,51 @@ const PostFooter = ({handleLike, post}) => {
 
 const CommentsSection = ({post}) => (
         <View>
-            {!!post.comments.length && (
+            {!!post.comments_by_users.length && (
                 <Text style={styles.text}>
-                    {post.comments.length > 1 ? ' all' : ''} {post.comments.length}
-                    {post.comments.length > 1 ? 'comments' : 'comment'}
+                    {post.comments_by_users.length > 1 ? ' all' : ''} {post.comments_by_users.length}
+                    {post.comments_by_users.length > 1 ? 'comments' : 'comment'}
                 </Text>
             )}
         </View>
     )
 
-const Comments = ({post}) => (
-    <View>
-        <FlatList
-            data={post.comments}
-            renderItem={({ item }) => (
-                <View>
-                    <Text style={styles.footerText}>{item.username} {item.text}</Text>
-                </View>
-            )}
-            keyExtractor={(item, index) => index.toString()}
-        />
-    </View>
-)
+const Comments = ({post, addComment}) => {
+    const [text, setText] = useState('')
+    const userData = useAuthentication()
+
+    return (
+        <View>
+            <FlatList
+                data={post.comments_by_users}
+                renderItem={({ item }) => (
+                    <View style={{flexDirection: 'row', alignItems:'center'}}>
+                        <Image source={{ uri: item.profile_picture }} style={{width:30, height:30, marginRight: 10, borderRadius:50}}/>
+                        <View>
+                            <Text style={styles.footerText}>{item.username}</Text>
+                            <Text style={styles.text}> {item.text}</Text>
+                        </View>
+                    </View>
+                )}
+                keyExtractor={(item, index) => index.toString()}
+            />
+            <TextInput
+                placeholder="Напиши щось чудове!"
+                onChangeText={(text) => setText(text)}
+                style={{color:'#fff'}}
+            />
+            <Pressable onPress={() => addComment(post, {
+                username: userData.username,
+                email: userData.email,
+                profile_picture: userData.profile_picture,
+                owner_uid: userData.owner_uid,
+                text
+            })}>
+                <Text style={styles.text}>Відіслати</Text>
+            </Pressable>
+        </View>
+    )
+}
 
 const styles = StyleSheet.create({
     headerContainer:{

@@ -127,15 +127,17 @@ const ProfileScreen = () => {
                             </View>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
-                            <FlatList
-                                horizontal
-                                data={userPosts}
-                                renderItem={({ item }) => (
-                                    <View>
-                                        <Image source={{ uri: item.imageUrl }} style={{ width: 100, height: 100, margin: 5 }} />
-                                    </View>
-                                )}
-                            />
+                            {userPosts.length && (
+                                <FlatList
+                                    horizontal
+                                    data={userPosts}
+                                    renderItem={({ item }) => (
+                                        <View>
+                                            <Image source={{ uri: item.imageUrl }} style={{ width: 100, height: 100, margin: 5 }} />
+                                        </View>
+                                    )}
+                                />
+                            )}
                         </View>
                     </View>
                 </View>

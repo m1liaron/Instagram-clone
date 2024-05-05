@@ -33,7 +33,10 @@ const SignUpForm = () => {
                 owner_uid: authUser.user.uid,
                 username,
                 email: authUser.user.email,
-                profile_picture: await getRandomProfilePicture()
+                profile_picture: await getRandomProfilePicture(),
+                followers_users: [],
+                following_users:[]
+
             });
         } catch (error) {
             if(Platform.OS === 'web') {

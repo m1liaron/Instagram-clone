@@ -1,7 +1,8 @@
 import React from 'react';
-import {View, Text, StyleSheet, SafeAreaView} from 'react-native'
+import {View, Text, StyleSheet} from 'react-native'
 import AntDesign from "react-native-vector-icons/AntDesign";
 import SignupForm from "../components/signup/SignupForm";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SignupScreen = () => {
     return (

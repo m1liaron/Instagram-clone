@@ -1,7 +1,8 @@
 import React from 'react';
-import {View, Text, StyleSheet, SafeAreaView} from 'react-native'
+import {View, Text, StyleSheet} from 'react-native'
 import AntDesign from "react-native-vector-icons/AntDesign";
 import LoginForm from "../components/login/LoginForm";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const LoginScreen = () => {
     return (

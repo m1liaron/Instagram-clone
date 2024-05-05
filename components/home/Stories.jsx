@@ -11,15 +11,15 @@ const STORIES = [
 
 
 const Stories = () => {
-    const [stories, setStories] = useState([]);
-    useEffect(() => {
-        onSnapshot(collectionGroup(db, 'stories'), snapshot => {
-            const newPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setStories(newPosts);
-        });
-
-    }, []); // Run effect only once on component
-    console.log(stories)
+    // const [stories, setStories] = useState([]);
+    // useEffect(() => {
+    //     onSnapshot(collectionGroup(db, 'stories'), snapshot => {
+    //         const newPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    //         setStories(newPosts);
+    //     });
+    //
+    // }, []); // Run effect only once on component
+    // console.log(stories)
     return (
         <View style={{marginBottom: 13, marginHorizontal: 20}}>
                 <FlatList

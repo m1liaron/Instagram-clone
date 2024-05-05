@@ -1,8 +1,9 @@
-import React, {useEffect} from 'react';
-import {StyleSheet, SafeAreaView} from 'react-native'
+import React from 'react';
+import {StyleSheet} from 'react-native'
 import Header from "../components/home/Header";
 import Stories from "../components/home/Stories";
 import PostList from "../components/home/PostList";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const HomeScreen = ({navigation}) => {
     return (

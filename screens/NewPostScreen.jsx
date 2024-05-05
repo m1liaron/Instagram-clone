@@ -1,6 +1,7 @@
 import React from 'react';
-import {View, Text, StyleSheet, SafeAreaView} from 'react-native'
+import {View, Text, StyleSheet} from 'react-native'
 import AddNewPost from "../components/newPost/AddNewPost";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const NewPostScreen = ({navigation}) => {
     return (

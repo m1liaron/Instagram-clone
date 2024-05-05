@@ -1,7 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, ScrollView, Image, FlatList} from 'react-native'
+import {collectionGroup, onSnapshot} from "firebase/firestore";
+import {db} from "../../firebase";
 
-const stories = [
+const STORIES = [
     { name: 'Alex', imageSource: 'https://t4.ftcdn.net/jpg/02/14/74/61/360_F_214746128_31JkeaP6rU0NzzzdFC4khGkmqc8noe6h.jpg' },
     { name: 'Max Beaver Beavrochenko', imageSource: 'https://t4.ftcdn.net/jpg/02/14/74/61/360_F_214746128_31JkeaP6rU0NzzzdFC4khGkmqc8noe6h.jpg' },
     { name: 'Beaver', imageSource: 'https://t4.ftcdn.net/jpg/02/14/74/61/360_F_214746128_31JkeaP6rU0NzzzdFC4khGkmqc8noe6h.jpg' }
@@ -9,10 +11,19 @@ const stories = [
 
 
 const Stories = () => {
+    const [stories, setStories] = useState([]);
+    useEffect(() => {
+        onSnapshot(collectionGroup(db, 'stories'), snapshot => {
+            const newPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setStories(newPosts);
+        });
+
+    }, []); // Run effect only once on component
+    console.log(stories)
     return (
         <View style={{marginBottom: 13, marginHorizontal: 20}}>
                 <FlatList
-                    data={stories}
+                    data={STORIES}
                     renderItem={({ item }) => (
                         <View style={styles.story}>
                             <Image

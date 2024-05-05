@@ -41,6 +41,7 @@ const FormikPostUpLoader = ({ navigation }) => {
     }, [])
 
     const uploadPostToFirebase = (imageUrl, caption) => {
+        console.log('Share post')
         const auth = getAuth(app);
         const user =  auth.currentUser;
         const unsubscribe = addDoc(collection(db, 'users', user.email, 'posts'), {
@@ -53,7 +54,9 @@ const FormikPostUpLoader = ({ navigation }) => {
             createdAt: serverTimestamp(),
             likes_by_users: [],
             comments: []
-        }).then(() => navigation.goBack());
+        }).then(() => navigation.goBack()).catch((error) => {
+            console.log(error)
+        })
 
         return unsubscribe;
     }

@@ -1,5 +1,5 @@
-import React from 'react';
-import {View, Text, StyleSheet, TextInput, Pressable, Alert, Platform} from 'react-native'
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, TextInput, Pressable, Alert, Platform, ActivityIndicator} from 'react-native'
 import {useNavigation} from "@react-navigation/native";
 import Validator from 'email-validator'
 import {object, string} from "yup";
@@ -10,6 +10,7 @@ import { getAuth, signInWithEmailAndPassword} from 'firebase/auth'
 
 // todo: make red if not right
 const LoginForm = () => {
+    const [loading, setLoading] = useState(false);
     const navigation = useNavigation();
 
     const LoginFormSchema = object().shape ({
@@ -20,6 +21,7 @@ const LoginForm = () => {
     })
 
     const onLogin = async (email, password) => {
+        setLoading(true)
         try {
             const auth = getAuth(app);
             await signInWithEmailAndPassword(auth, email, password)
@@ -34,6 +36,8 @@ const LoginForm = () => {
                     error.message + '\n\n'
                 );
             }
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -88,7 +92,11 @@ const LoginForm = () => {
                             onPress={handleSubmit}
                             disabled={!isValid}
                         >
-                            <Text style={{color:'#fff', textAlign:'center'}}>Log in</Text>
+                            {loading ? (
+                                <ActivityIndicator size={10} color="blue"/>
+                            ) : (
+                                <Text style={{color:'#fff', textAlign:'center'}}>Log in</Text>
+                            )}
                         </Pressable>
                         <View style={{flexDirection:'row',justifyContent:'center', marginTop:20}}>
                             <Text >Don't have an account? </Text>

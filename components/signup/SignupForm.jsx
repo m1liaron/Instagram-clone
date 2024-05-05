@@ -1,15 +1,16 @@
-import React from 'react';
-import {View, Text, StyleSheet, TextInput, Pressable, Platform, Alert} from 'react-native'
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, TextInput, Pressable, Platform, Alert, ActivityIndicator} from 'react-native'
 import {useNavigation} from "@react-navigation/native";
 import Validator from 'email-validator'
 import {object, string} from "yup";
 import {Formik} from "formik";
 import { app, db } from "../../firebase";
-import { addDoc, collection, setDoc, doc } from 'firebase/firestore';
+import { setDoc, doc } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword} from 'firebase/auth'
 
 // todo: make red if not right
 const SignUpForm = () => {
+    const [loading, setLoading] = useState(false);
     const navigation = useNavigation();
 
     const LoginFormSchema = object().shape ({
@@ -21,6 +22,7 @@ const SignUpForm = () => {
     })
 
     const onSignup= async (email, password, username) => {
+        setLoading(true)
         try {
             const auth = getAuth(app);
             const authUser = await createUserWithEmailAndPassword(auth, email, password)
@@ -42,6 +44,8 @@ const SignUpForm = () => {
                     error.message + '\n\n'
                 );
             }
+        }  finally {
+            setLoading(false)
         }
     }
 
@@ -124,7 +128,11 @@ const SignUpForm = () => {
                             onPress={handleSubmit}
                             disabled={!isValid}
                         >
-                            <Text style={{color:'#fff', textAlign:'center'}}>Log in</Text>
+                            {loading ? (
+                                <ActivityIndicator size={10} color="blue"/>
+                            ) : (
+                                   <Text style={{color:'#fff', textAlign:'center'}}>Sign up</Text>
+                            )}
                         </Pressable>
                         <View style={{flexDirection:'row',justifyContent:'center', marginTop:20}}>
                             <Text >Already have an account? </Text>

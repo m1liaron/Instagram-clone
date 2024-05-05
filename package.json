@@ -29,7 +29,9 @@
     "react-native-vector-icons": "^10.1.0",
     "react-native-web": "~0.19.6",
     "valid-url": "^1.0.9",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "expo-image-picker": "~14.7.1",
+    "expo-file-system": "~16.0.9"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

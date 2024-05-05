@@ -14,10 +14,9 @@ const uploadPostSchema = object().shape({
     caption: string().max(2200, 'Caption has reached the character limit'),
 })
 
-const FormikPostUpLoader = ({ navigation }) => {
+const FormikPostUpLoader = ({ navigation, image, setImage }) => {
     const [thumbnailUrl, setThumbnailUrl] = useState(PLACEHOLDER_IMG);
     const [currentLoggedInUser, setCurrentLoggedInUser] = useState(null);
-
     const getUserName = () => {
         const auth = getAuth(app);
         const user =  auth.currentUser;

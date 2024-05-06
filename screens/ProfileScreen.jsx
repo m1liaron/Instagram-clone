@@ -8,35 +8,22 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import Feather from "react-native-vector-icons/Feather";
 import Entypo from "react-native-vector-icons/Entypo";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
+import {useNavigation} from "@react-navigation/native";
+import {useAuthentication} from "../hooks/useAuthentication";
+import {useGetUserPosts} from "../hooks/useGetUserPosts";
 
 const ProfileScreen = () => {
-    const [userData, setUserData] = useState(null);
-    const [userPosts, setUserPosts] = useState([]);
     const [userStories, setUserStories] = useState([]);
+
+    const navigation = useNavigation();
 
     const auth = getAuth();
     const user = auth.currentUser;
+    const userData = useAuthentication()
+    const userPosts = useGetUserPosts(user.email)
 
     useEffect(() => {
-        if (user) {
-            const docRef = doc(db, 'users', user.email); // Assuming user documents are stored under 'users' collection with user's email as document ID
-            getDoc(docRef)
-                .then((docSnap) => {
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        setUserData(data);
-                    } else {
-                        console.log('No such document!');
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error getting document:', error);
-                });
-        }
-    }, []);
-
-    useEffect(() => {
-        const fetchPosts = async () => {
+        const fetchStories = async () => {
             const querySnapshot = await getDocs(collection(db, 'users', user.email, 'stories'));
             const stories = [];
             querySnapshot.forEach((doc) => {
@@ -47,28 +34,9 @@ const ProfileScreen = () => {
             setUserStories(stories);
         };
 
-            fetchPosts();
+            fetchStories();
     }, []); // Run effect only once on component
 
-    useEffect(() => {
-        const fetchPosts = async () => {
-            const querySnapshot = await getDocs(collection(db, 'users', user.email, 'posts'));
-            const posts = [];
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                data.id = doc.id;
-                posts.push(data);
-            });
-            setUserPosts(posts);
-        };
-
-        // Ensure user is logged in before fetching posts
-        if (user) {
-            fetchPosts();
-        }
-    }, [user]); // Dependency array to ensure useEffect runs when `user` changes
-
-    console.log(userStories)
     return (
         <SafeAreaView style={styles.container}>
             {userData ? (
@@ -95,15 +63,15 @@ const ProfileScreen = () => {
 
                             <View style={styles.flex}>
                                 <View style={styles.activity}>
-                                    <Text style={styles.text}>{userPosts.length || 0}</Text>
+                                    <Text style={styles.text}>{userPosts?.length}</Text>
                                     <Text style={styles.text}>дописи</Text>
                                 </View>
                                 <View style={styles.activity}>
-                                    <Text style={styles.text}>{userData.followers_users.length}</Text>
+                                    <Text style={styles.text}>{userData.followers_users?.length}</Text>
                                     <Text style={styles.text}>читачі</Text>
                                 </View>
                                 <View style={styles.activity}>
-                                    <Text style={styles.text}>{userData.following_users.length}</Text>
+                                    <Text style={styles.text}>{userData.following_users?.length}</Text>
                                     <Text style={styles.text}>стежить за</Text>
                                 </View>
                             </View>
@@ -128,45 +96,29 @@ const ProfileScreen = () => {
                             <FlatList
                                 data={userStories}
                                 renderItem={({ item }) => (
-                                    <View style={styles.story}>
-                                        <Image
-                                            source={item.imageUrl}
-                                            style={styles.storyImage}
-                                        />
-                                    </View>
+                                        <View style={styles.story} key={item.id}>
+                                            <Image
+                                                source={item.imageUrl}
+                                                style={styles.storyImage}
+                                            />
+                                        </View>
                                 )}
                                 horizontal={true}
                                 showsHorizontalScrollIndicator={false}
                             />
                         </View>
 
-                        {/*<View style={styles.flex}>*/}
-                        {/*    <View style={styles.story}>*/}
-                        {/*        <Image source={{uri: "https://cdn.britannica.com/83/28383-050-33D8DB80/Beaver.jpg"}} style={styles.storyImage} />*/}
-                        {/*        <Text style={styles.text}>My beaver</Text>*/}
-                        {/*    </View>*/}
-                        {/*    <View style={styles.story}>*/}
-                        {/*        <Image source={{uri: "https://cdn.britannica.com/83/28383-050-33D8DB80/Beaver.jpg"}} style={styles.storyImage} />*/}
-                        {/*        <Text style={styles.text}>My beaver</Text>*/}
-                        {/*    </View>*/}
-                        {/*    <View style={styles.story}>*/}
-                        {/*        <Image source={{uri: "https://cdn.britannica.com/83/28383-050-33D8DB80/Beaver.jpg"}} style={styles.storyImage} />*/}
-                        {/*        <Text style={styles.text}>My beaver</Text>*/}
-                        {/*    </View>*/}
-                        {/*    <View style={styles.story}>*/}
-                        {/*        <Image source={{uri: "https://cdn.britannica.com/83/28383-050-33D8DB80/Beaver.jpg"}} style={styles.storyImage} />*/}
-                        {/*        <Text style={styles.text}>My beaver</Text>*/}
-                        {/*    </View>*/}
-                        {/*</View>*/}
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
-                            {userPosts.length && (
+                            {userPosts?.length && (
                                 <FlatList
                                     horizontal
                                     data={userPosts}
                                     renderItem={({ item }) => (
-                                        <View>
-                                            <Image source={{ uri: item.imageUrl }} style={{ width: 100, height: 100, margin: 5 }} />
-                                        </View>
+                                        <Pressable key={item.id} onPress={() => navigation.navigate('Posts', { userEmail: userData.email, selectedPostId: item.id})}>
+                                            <View>
+                                                <Image source={{ uri: item.imageUrl }} style={{ width: 100, height: 100, margin: 5 }} />
+                                            </View>
+                                        </Pressable>
                                     )}
                                 />
                             )}

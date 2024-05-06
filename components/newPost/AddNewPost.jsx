@@ -64,13 +64,8 @@ export const LoadImage = ({image, setImage}) => {
                 xhr.send(null)
             })
 
-            const filename = image.substring(image.lastIndexOf('/') + 1);
-            console.log(filename)
-            // const ref = getFirestore().ref().child(filename);
-
             await ref.put(blob);
             setUploading(false);
-            console.log('photo uploaded')
             setImage(null)
         } catch (error){
             console.log(error)
@@ -82,7 +77,11 @@ export const LoadImage = ({image, setImage}) => {
             <Pressable onPress={pickImage}>
                 <Text style={styles.headerText}>Pick an image from camera roll</Text>
             </Pressable>
-            {image && <Image source={{ uri: image }} style={styles.image} />}
+            {image && (
+                <View>
+                    <Image source={{ uri: image }} style={styles.image} />
+                </View>
+            )}
         </View>
     );
 }

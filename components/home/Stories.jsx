@@ -25,10 +25,12 @@ const Stories = () => {
                     data={stories}
                     renderItem={({ item }) => (
                         <View style={styles.story}>
-                            <Image
-                                source={item.imageUrl}
-                                style={styles.storyImage}
-                            />
+                            <View style={styles.storyBorder}>
+                                <Image
+                                    source={item.imageUrl}
+                                    style={styles.storyImage}
+                                />
+                            </View>
                             <Text style={styles.text}>{item.user.length > 11 ? item.user.slice(0, 6).toLowerCase() + '...' : item.user}</Text>
                         </View>
                     )}
@@ -47,7 +49,13 @@ const styles = StyleSheet.create({
         width: 70,
         height: 70,
         borderRadius: 50,
-        marginLeft:18,
+        borderWidth: 3,
+        borderColor: '#000'
+    },
+    storyBorder:{
+        width: 75,
+        height: 76,
+        borderRadius: 50,
         borderWidth: 3,
         borderColor: '#ff8501'
     },

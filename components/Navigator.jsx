@@ -10,6 +10,7 @@ import SignupScreen from "../screens/SignupScreen";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import AuthNavigation from "./AuthNavigation";
 import LoadingScreen from "../screens/LoadingScreen";
+import PostsScreen from "../screens/PostsScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator()
@@ -64,6 +65,7 @@ export const MainNavigator = () => (
 
     >
         <Stack.Screen name="Home" component={AuthNavigation} />
+        <Stack.Screen name="Posts" component={PostsScreen} />
     </Stack.Navigator>
 )
 

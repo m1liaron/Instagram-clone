@@ -11,26 +11,25 @@ const STORIES = [
 
 
 const Stories = () => {
-    // const [stories, setStories] = useState([]);
-    // useEffect(() => {
-    //     onSnapshot(collectionGroup(db, 'stories'), snapshot => {
-    //         const newPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    //         setStories(newPosts);
-    //     });
-    //
-    // }, []); // Run effect only once on component
-    // console.log(stories)
+    const [stories, setStories] = useState([]);
+    useEffect(() => {
+        onSnapshot(collectionGroup(db, 'stories'), snapshot => {
+            const newPosts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setStories(newPosts);
+        });
+
+    }, []); // Run effect only once on component
     return (
         <View style={{marginBottom: 13, marginHorizontal: 20}}>
                 <FlatList
-                    data={STORIES}
+                    data={stories}
                     renderItem={({ item }) => (
                         <View style={styles.story}>
                             <Image
-                                source={item.imageSource}
+                                source={item.imageUrl}
                                 style={styles.storyImage}
                             />
-                            <Text style={styles.text}>{item.name.length > 11 ? item.name.slice(0, 6).toLowerCase() + '...' : item.name}</Text>
+                            <Text style={styles.text}>{item.user.length > 11 ? item.user.slice(0, 6).toLowerCase() + '...' : item.user}</Text>
                         </View>
                     )}
                     horizontal={true}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {View, Text, StyleSheet, Image, Pressable, FlatList} from 'react-native'; // Import Image from react-native
 import { db } from '../firebase';
 import { getAuth } from 'firebase/auth';
-import { collection, doc, getDocs, getDoc} from 'firebase/firestore';
+import {collection, doc, getDocs, getDoc, onSnapshot, collectionGroup} from 'firebase/firestore';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Feather from "react-native-vector-icons/Feather";
@@ -12,6 +12,8 @@ import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 const ProfileScreen = () => {
     const [userData, setUserData] = useState(null);
     const [userPosts, setUserPosts] = useState([]);
+    const [userStories, setUserStories] = useState([]);
+
     const auth = getAuth();
     const user = auth.currentUser;
 
@@ -35,6 +37,21 @@ const ProfileScreen = () => {
 
     useEffect(() => {
         const fetchPosts = async () => {
+            const querySnapshot = await getDocs(collection(db, 'users', user.email, 'stories'));
+            const stories = [];
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                data.id = doc.id;
+                stories.push(data);
+            });
+            setUserStories(stories);
+        };
+
+            fetchPosts();
+    }, []); // Run effect only once on component
+
+    useEffect(() => {
+        const fetchPosts = async () => {
             const querySnapshot = await getDocs(collection(db, 'users', user.email, 'posts'));
             const posts = [];
             querySnapshot.forEach((doc) => {
@@ -51,8 +68,7 @@ const ProfileScreen = () => {
         }
     }, [user]); // Dependency array to ensure useEffect runs when `user` changes
 
-    console.log(userData)
-    console.log(userPosts)
+    console.log(userStories)
     return (
         <SafeAreaView style={styles.container}>
             {userData ? (
@@ -79,7 +95,7 @@ const ProfileScreen = () => {
 
                             <View style={styles.flex}>
                                 <View style={styles.activity}>
-                                    <Text style={styles.text}>{userPosts.length}</Text>
+                                    <Text style={styles.text}>{userPosts.length || 0}</Text>
                                     <Text style={styles.text}>дописи</Text>
                                 </View>
                                 <View style={styles.activity}>
@@ -108,24 +124,40 @@ const ProfileScreen = () => {
                                 </Pressable>
                             </View>
                         )}
-                        <View style={styles.flex}>
-                            <View style={styles.story}>
-                                <Image source={{uri: "https://cdn.britannica.com/83/28383-050-33D8DB80/Beaver.jpg"}} style={styles.storyImage} />
-                                <Text style={styles.text}>My beaver</Text>
-                            </View>
-                            <View style={styles.story}>
-                                <Image source={{uri: "https://cdn.britannica.com/83/28383-050-33D8DB80/Beaver.jpg"}} style={styles.storyImage} />
-                                <Text style={styles.text}>My beaver</Text>
-                            </View>
-                            <View style={styles.story}>
-                                <Image source={{uri: "https://cdn.britannica.com/83/28383-050-33D8DB80/Beaver.jpg"}} style={styles.storyImage} />
-                                <Text style={styles.text}>My beaver</Text>
-                            </View>
-                            <View style={styles.story}>
-                                <Image source={{uri: "https://cdn.britannica.com/83/28383-050-33D8DB80/Beaver.jpg"}} style={styles.storyImage} />
-                                <Text style={styles.text}>My beaver</Text>
-                            </View>
+                        <View style={{...styles.flex, marginHorizontal: 15}}>
+                            <FlatList
+                                data={userStories}
+                                renderItem={({ item }) => (
+                                    <View style={styles.story}>
+                                        <Image
+                                            source={item.imageUrl}
+                                            style={styles.storyImage}
+                                        />
+                                    </View>
+                                )}
+                                horizontal={true}
+                                showsHorizontalScrollIndicator={false}
+                            />
                         </View>
+
+                        {/*<View style={styles.flex}>*/}
+                        {/*    <View style={styles.story}>*/}
+                        {/*        <Image source={{uri: "https://cdn.britannica.com/83/28383-050-33D8DB80/Beaver.jpg"}} style={styles.storyImage} />*/}
+                        {/*        <Text style={styles.text}>My beaver</Text>*/}
+                        {/*    </View>*/}
+                        {/*    <View style={styles.story}>*/}
+                        {/*        <Image source={{uri: "https://cdn.britannica.com/83/28383-050-33D8DB80/Beaver.jpg"}} style={styles.storyImage} />*/}
+                        {/*        <Text style={styles.text}>My beaver</Text>*/}
+                        {/*    </View>*/}
+                        {/*    <View style={styles.story}>*/}
+                        {/*        <Image source={{uri: "https://cdn.britannica.com/83/28383-050-33D8DB80/Beaver.jpg"}} style={styles.storyImage} />*/}
+                        {/*        <Text style={styles.text}>My beaver</Text>*/}
+                        {/*    </View>*/}
+                        {/*    <View style={styles.story}>*/}
+                        {/*        <Image source={{uri: "https://cdn.britannica.com/83/28383-050-33D8DB80/Beaver.jpg"}} style={styles.storyImage} />*/}
+                        {/*        <Text style={styles.text}>My beaver</Text>*/}
+                        {/*    </View>*/}
+                        {/*</View>*/}
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
                             {userPosts.length && (
                                 <FlatList

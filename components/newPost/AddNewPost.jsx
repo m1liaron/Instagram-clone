@@ -28,7 +28,7 @@ const Header = ({ navigation }) => {
     )
 }
 
-const LoadImage = ({image, setImage}) => {
+export const LoadImage = ({image, setImage}) => {
     const [uploading, setUploading] = useState(false);
 
     const pickImage = async () => {

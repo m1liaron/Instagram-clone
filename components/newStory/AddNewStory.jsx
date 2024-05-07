@@ -58,6 +58,7 @@ const AddNewStory = () => {
 
     return (
         <View>
+
             <LoadImage image={image} setImage={setImage}/>
             <Pressable onPress={() => uploadStoryToFirebase(image, )}>
                 <Text style={{color:'#fff'}}>Share stories!</Text>

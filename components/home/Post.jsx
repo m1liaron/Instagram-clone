@@ -7,15 +7,12 @@ import {getAuth} from "firebase/auth";
 import {db} from "../../firebase";
 import {collection, arrayUnion, arrayRemove, doc, updateDoc} from "firebase/firestore";
 import {useAuthentication} from "../../hooks/useAuthentication";
+import {useNavigation} from "@react-navigation/native";
 
 const Post = ({post}) => {
 
     const addComment = (post, data) => {
-        const auth = getAuth();
-        const user = auth.currentUser;
         console.log(post)
-        console.log('add comment')
-        console.log('user', data)
         const postRef = doc(db, 'users', post.owner_email, 'posts', post.id);
         updateDoc(postRef, {
             comments_by_users: arrayUnion(data)
@@ -54,24 +51,28 @@ const Post = ({post}) => {
 };
 
 const PostHeader = ({post}) => {
+    const navigation = useNavigation();
+    const currentUser = useAuthentication()
     return (
         <View style={{justifyContent:'space-between', flexDirection:'row'}}>
-            <View style={styles.headerContainer}>
+            <Pressable style={styles.headerContainer} onPress={() => {
+                currentUser.email === post.owner_email ? navigation.navigate('Profile') : navigation.navigate('UserProfile', {userEmail: post.owner_email})
+            }}>
                 <Image style={styles.avatar} source={post.profile_picture}/>
                 <Text style={styles.text}>{post.user}</Text>
-            </View>
+            </Pressable>
             <Text style={styles.text}>...</Text>
         </View>
     )
 }
 
 const PostImage = ({post}) => (
-    <View style={{width:'100%', height: 450}}>
+    <Pressable style={{width:'100%', height: 450}}>
         <Image
             style={{height: '100%', resizeMode: 'cover'}}
             source={{uri: post.imageUrl}}
         />
-    </View>
+    </Pressable>
 )
 
 const PostFooter = ({handleLike, post, addComment}) => {

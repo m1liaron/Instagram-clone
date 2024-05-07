@@ -11,6 +11,8 @@ import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import AuthNavigation from "./AuthNavigation";
 import LoadingScreen from "../screens/LoadingScreen";
 import PostsScreen from "../screens/PostsScreen";
+import UserProfileScreen from "../screens/UserProfileScreen";
+import ConnectionsScreen from "../screens/ConnectionsScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator()
@@ -66,6 +68,8 @@ export const MainNavigator = () => (
     >
         <Stack.Screen name="Home" component={AuthNavigation} />
         <Stack.Screen name="Posts" component={PostsScreen} />
+        <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+        <Stack.Screen name="Connections" component={ConnectionsScreen} />
     </Stack.Navigator>
 )
 

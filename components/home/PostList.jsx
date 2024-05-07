@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, FlatList} from 'react-native'
+import { FlatList} from 'react-native'
 import Post from "./Post";
 import {collectionGroup, onSnapshot} from "firebase/firestore";
 import {db} from "../../firebase";

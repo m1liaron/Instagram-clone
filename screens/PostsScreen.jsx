@@ -30,7 +30,6 @@ const PostsScreen = ({route}) => {
         scrollToPost()
     }, [selectedPostId, userPosts]);
 
-
     return (
         <SafeAreaView style={{flex:1, backgroundColor:'#000'}}>
             <Pressable onPress={() => navigation.goBack()}>

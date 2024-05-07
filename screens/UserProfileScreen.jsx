@@ -1,25 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import {View, Text, StyleSheet, Image, Pressable, FlatList} from 'react-native'; // Import Image from react-native
-import { getAuth } from 'firebase/auth';
+import React, {useEffect, useState} from 'react';
+import {View, Text, StyleSheet, Image, Pressable, FlatList, ActivityIndicator} from 'react-native'; // Import Image from react-native
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AntDesign from "react-native-vector-icons/AntDesign";
 import Feather from "react-native-vector-icons/Feather";
 import Entypo from "react-native-vector-icons/Entypo";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
 import {useNavigation} from "@react-navigation/native";
-import {useAuthentication} from "../hooks/useAuthentication";
 import {useGetUserPosts} from "../hooks/useGetUserPosts";
+import {useGetUserById} from "../hooks/useGetUserById";
 import {useGetStories} from "../hooks/useGetStories";
+import {arrayUnion, doc, updateDoc, arrayRemove} from "firebase/firestore";
+import {db} from "../firebase";
+import {useAuthentication} from "../hooks/useAuthentication";
 
-const ProfileScreen = () => {
-
+const ProfileScreen = ({route}) => {
+    const {userEmail} = route.params;
     const navigation = useNavigation();
 
-    const auth = getAuth();
-    const user = auth.currentUser;
-    const userData = useAuthentication()
-    const userPosts = useGetUserPosts(user.email)
-    const userStories = useGetStories(user.email)
+    const userData = useGetUserById(userEmail)
+    const userPosts = useGetUserPosts(userEmail)
+    const userStories = useGetStories(userEmail)
+    const currentUser = useAuthentication();
+
+    const isFollowing = userData?.followers_users.map(item => item.email).includes(currentUser?.email);
+
+    const follow = () => {
+        const postRef = doc(db, 'users', userEmail);
+            updateDoc(postRef, {
+                followers_users: !isFollowing ? arrayUnion(currentUser) : arrayRemove(currentUser)
+            }).then(() => {
+                console.log('Document updated');
+            }).catch(error => {
+                console.error('Error updating document: ', error);
+            });
+    }
+
+    const navigateTo = (connection) => {
+        navigation.navigate('Connections', {userEmail: userData.email, state: connection})
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -40,11 +58,6 @@ const ProfileScreen = () => {
                         <View style={styles.main}>
                             <View style={{marginRight:40}}>
                                 <Image source={{ uri: userData.profile_picture || 'https://png.pngtree.com/png-vector/20220608/ourmid/pngtree-man-avatar-isolated-on-white-background-png-image_4891418.png' }} style={styles.profilePicture} />
-                                <Pressable onPress={() => navigation.navigate('Post')}>
-                                    <View style={styles.plus}>
-                                        <Entypo name='plus' size={17} color='#fff'/>
-                                    </View>
-                                </Pressable>
                             </View>
 
                             <View style={styles.flex}>
@@ -52,14 +65,18 @@ const ProfileScreen = () => {
                                     <Text style={styles.text}>{userPosts?.length}</Text>
                                     <Text style={styles.text}>дописи</Text>
                                 </View>
-                                <View style={styles.activity}>
-                                    <Text style={styles.text}>{userData.followers_users?.length}</Text>
-                                    <Text style={styles.text}>читачі</Text>
-                                </View>
-                                <View style={styles.activity}>
-                                    <Text style={styles.text}>{userData.following_users?.length}</Text>
-                                    <Text style={styles.text}>стежить за</Text>
-                                </View>
+                               <Pressable onPress={() => navigateTo('followers_users')}>
+                                   <View style={styles.activity}>
+                                       <Text style={styles.text}>{userData.followers_users?.length}</Text>
+                                       <Text style={styles.text}>читачі</Text>
+                                   </View>
+                               </Pressable>
+                                <Pressable onPress={() => navigateTo('following_users')}>
+                                    <View style={styles.activity}>
+                                        <Text style={styles.text}>{userData.following_users?.length}</Text>
+                                        <Text style={styles.text}>стежить за</Text>
+                                    </View>
+                                </Pressable>
                             </View>
                         </View>
                         <Text style={{...styles.text, marginLeft:20}}>{userData.username}</Text>
@@ -68,16 +85,24 @@ const ProfileScreen = () => {
                                 <Text style={{...styles.text, marginLeft:20, fontSize:15}}>{userData.biography}</Text>
                             )}
                         </View>
+                        <View style={{...styles.flex, marginBottom:15}}>
+                                <Pressable style={{...styles.activityButton, backgroundColor:!isFollowing ? '#4962a0' : '#444444'}} onPress={follow}>
+                                    <Text style={{...styles.text, textAlign:'center'}}>{!isFollowing ? 'Стежити' : 'Відстежується'}</Text>
+                                </Pressable>
+                            <Pressable style={{...styles.activityButton, backgroundColor:'#e7e7e7'}}>
+                                <Text style={{textAlign:'center'}}>Повідомлення</Text>
+                            </Pressable>
+                        </View>
                         <View style={{...styles.flex, marginHorizontal: 15}}>
                             <FlatList
                                 data={userStories}
                                 renderItem={({ item }) => (
-                                        <View style={styles.story} key={item.id}>
-                                            <Image
-                                                source={item.imageUrl}
-                                                style={styles.storyImage}
-                                            />
-                                        </View>
+                                    <View style={styles.story} key={item.id}>
+                                        <Image
+                                            source={item.imageUrl}
+                                            style={styles.storyImage}
+                                        />
+                                    </View>
                                 )}
                                 horizontal={true}
                                 showsHorizontalScrollIndicator={false}
@@ -102,7 +127,9 @@ const ProfileScreen = () => {
                     </View>
                 </View>
             ) : (
-                <Text>Loading...</Text>
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#fff" />
+                </View>
             )}
         </SafeAreaView>
     );
@@ -122,17 +149,17 @@ const styles = StyleSheet.create({
         marginRight:30
     },
     header:{
-       justifyContent:'space-between',
-       alignItems:'center',
-       flexDirection:'row',
-       marginHorizontal:20,
-       marginBottom:40
+        justifyContent:'space-between',
+        alignItems:'center',
+        flexDirection:'row',
+        marginHorizontal:20,
+        marginBottom:40
     },
     titleName:{
-      fontSize:27,
-      fontWeight:'500',
-      color:'#fff',
-      marginRight:7
+        fontSize:27,
+        fontWeight:'500',
+        color:'#fff',
+        marginRight:7
     },
     text: {
         color: '#fff',
@@ -167,7 +194,7 @@ const styles = StyleSheet.create({
         alignItems:'center'
     },
     activityButton:{
-        padding:8,
+        padding:4,
         width:'40%',
         backgroundColor:'#4962a0',
         borderRadius:5,
@@ -187,7 +214,12 @@ const styles = StyleSheet.create({
         borderRadius:50,
         borderWidth:5,
         borderColor:'#494949'
-    }
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
 });
 
 export default ProfileScreen;

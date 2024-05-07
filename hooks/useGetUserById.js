@@ -26,7 +26,7 @@ export const useGetUserById = (email) => {
             getUser();
         }
 
-    }, [email]);
+    }, []);
 
     return userData;
 };

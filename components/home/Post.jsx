@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {View, Text, StyleSheet, Image, Pressable, FlatList, TextInput} from 'react-native'
 import AntDesign from "react-native-vector-icons/AntDesign";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -8,6 +8,7 @@ import {db} from "../../firebase";
 import {collection, arrayUnion, arrayRemove, doc, updateDoc} from "firebase/firestore";
 import {useAuthentication} from "../../hooks/useAuthentication";
 import {useNavigation} from "@react-navigation/native";
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 
 const Post = ({post}) => {
 
@@ -66,14 +67,18 @@ const PostHeader = ({post}) => {
     )
 }
 
-const PostImage = ({post}) => (
-    <Pressable style={{width:'100%', height: 450}}>
-        <Image
-            style={{height: '100%', resizeMode: 'cover'}}
-            source={{uri: post.imageUrl}}
-        />
-    </Pressable>
-)
+const PostImage = ({post}) => {
+    const navigation = useNavigation();
+
+    return (
+        <Pressable style={{width:'100%', height: 450}} onPress={() => navigation.navigate('Posts', { userEmail: post.owner_email, selectedPostId: post.id})}>
+            <Image
+                style={{height: '100%', resizeMode: 'cover'}}
+                source={{uri: post.imageUrl}}
+            />
+        </Pressable>
+    )
+}
 
 const PostFooter = ({handleLike, post, addComment}) => {
     return(
@@ -150,6 +155,32 @@ const Comments = ({post, addComment}) => {
             })}>
                 <Text style={styles.text}>Відіслати</Text>
             </Pressable>
+            <BottomSheetComponent/>
+        </View>
+    )
+}
+
+const BottomSheetComponent = () => {
+    const bottomSheetRef = useRef(null);
+    const snapPoints = useMemo(() => ['25%', '50%', '75%'], []);
+
+    const handleSheetChanges = useCallback((index) => {
+        console.log('handleSheetChanges', index);
+    }, []);
+
+    const openSheet = () => bottomSheetRef.current.expand();
+
+    return (
+        <View style={styles.container}>
+            <BottomSheet
+                ref={bottomSheetRef}
+                onChange={handleSheetChanges}
+                snapPoints={snapPoints}
+            >
+                <BottomSheetView style={styles.contentContainer}>
+                    <Text>Awesome 🎉</Text>
+                </BottomSheetView>
+            </BottomSheet>
         </View>
     )
 }
@@ -189,7 +220,16 @@ const styles = StyleSheet.create({
     },
     icon:{
         marginRight:10
-    }
+    },
+    container: {
+        flex: 1,
+        padding: 24,
+        backgroundColor: 'grey',
+    },
+    contentContainer: {
+        flex: 1,
+        alignItems: 'center',
+    },
 })
 
 export default Post;

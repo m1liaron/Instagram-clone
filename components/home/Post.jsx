@@ -5,7 +5,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import {getAuth} from "firebase/auth";
 import {db} from "../../firebase";
-import {collection, arrayUnion, arrayRemove, doc, updateDoc} from "firebase/firestore";
+import {arrayUnion, arrayRemove, doc, updateDoc} from "firebase/firestore";
 import {useAuthentication} from "../../hooks/useAuthentication";
 import {useNavigation} from "@react-navigation/native";
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
@@ -81,6 +81,7 @@ const PostImage = ({post}) => {
 }
 
 const PostFooter = ({handleLike, post, addComment}) => {
+
     return(
         <View>
             <View style={styles.iconsList}>
@@ -92,7 +93,9 @@ const PostFooter = ({handleLike, post, addComment}) => {
                             <AntDesign name="hearto" style={styles.icon} color='#fff' size={20}/>
                         )}
                     </Pressable>
-                    <FontAwesome name="comment-o" style={styles.icon} color="#fff" size={20}/>
+                    <Pressable onPress={() => setShowBottomSheet(!showBottomSheet)}>
+                        <FontAwesome name="comment-o" style={styles.icon} color="#fff" size={20}/>
+                    </Pressable>
                     <FontAwesome name="send-o" style={styles.icon} color="#fff" size={20}/>
                 </View>
                     <Fontisto name="favorite" color='#fff' size={20}/>
@@ -155,14 +158,13 @@ const Comments = ({post, addComment}) => {
             })}>
                 <Text style={styles.text}>Відіслати</Text>
             </Pressable>
-            <BottomSheetComponent/>
         </View>
     )
 }
 
-const BottomSheetComponent = () => {
+export const BottomSheetComponent = () => {
     const bottomSheetRef = useRef(null);
-    const snapPoints = useMemo(() => ['25%', '50%', '75%'], []);
+    const snapPoints = useMemo(() => ['25%', '50%', '75%', '100%'], []);
 
     const handleSheetChanges = useCallback((index) => {
         console.log('handleSheetChanges', index);

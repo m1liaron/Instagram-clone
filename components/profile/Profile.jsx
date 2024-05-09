@@ -1,13 +1,23 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, Image, Pressable, FlatList, ActivityIndicator} from 'react-native'
 import {useNavigation} from "@react-navigation/native";
 import {getAuth} from "firebase/auth";
 import {useGetUserPosts} from "../../hooks/useGetUserPosts";
 import {useGetStories} from "../../hooks/useGetStories";
 import Entypo from "react-native-vector-icons/Entypo";
-import {arrayRemove, arrayUnion, doc, updateDoc} from "firebase/firestore";
+import {
+    addDoc,
+    arrayRemove,
+    arrayUnion,
+    collection,
+    doc,
+    getDocs,
+    serverTimestamp,
+    updateDoc
+} from "firebase/firestore";
 import {db} from "../../firebase";
 import {useAuthentication} from "../../hooks/useAuthentication";
+import {useGetUserGroups} from "../../hooks/useGetUserGroups";
 
 const Profile = ({userData}) => {
     const navigation = useNavigation();
@@ -17,9 +27,50 @@ const Profile = ({userData}) => {
     const currentUser = useAuthentication();
     const userPosts = useGetUserPosts(user.email)
     const userStories = useGetStories(user.email)
+    const userGroups = useGetUserGroups(user.email)
 
     const isCurrentUser = user.email === userData.email;
     const isFollowing = userData?.followers_users && currentUser?.email ? userData.followers_users.map(item => item.email).includes(currentUser.email) : false; // check if you(currentUser) following this user, clicked
+
+    const addGroupsToUser = () => {
+        const unsubscribe = addDoc(collection(db, 'users', userData.email, 'groups'), {
+            user: currentUser.username,
+            profile_picture: currentUser.profile_picture || '',
+            user_email: currentUser.email,
+            owner_email: userData.email,
+            owner_uid: user.uid,
+            createdAt: serverTimestamp(),
+        }).then(() => {
+            console.log('Add groups to user')
+            navigation.navigate('Messenger')
+        }).catch((error) => {
+            console.log(error)
+        })
+        return unsubscribe;
+    }
+
+    const sendMessage = () => {
+        if(!userGroups.map(item => item.user_email).includes(userData.email)) {
+            const unsubscribe = addDoc(collection(db, 'users', user.email, 'groups'), {
+                user: userData.username,
+                profile_picture: currentUser.profile_picture || '',
+                user_email: user.email,
+                owner_uid: userData.uid,
+                owner_email: userData.email,
+                createdAt: serverTimestamp(),
+            }).then(() => {
+                console.log('Add groups to user')
+                addGroupsToUser()
+                navigation.navigate('Messenger')
+            }).catch((error) => {
+                console.log(error)
+            })
+            return unsubscribe;
+        } else {
+            console.log('You already have messages with this user')
+            navigation.navigate('Messenger')
+        }
+    }
 
     const follow = () => {
         const postRef = doc(db, 'users', userData.email);
@@ -77,7 +128,7 @@ const Profile = ({userData}) => {
                                 <Pressable style={{...styles.activityButton, backgroundColor:!isFollowing ? '#4962a0' : '#444444'}} onPress={follow}>
                                     <Text style={{...styles.text, textAlign:'center'}}>{!isFollowing ? 'Стежити' : 'Відстежується'}</Text>
                                 </Pressable>
-                                <Pressable style={{...styles.activityButton, backgroundColor:'#e7e7e7'}}>
+                                <Pressable style={{...styles.activityButton, backgroundColor:'#e7e7e7'}} onPress={sendMessage}>
                                     <Text style={{textAlign:'center'}}>Повідомлення</Text>
                                 </Pressable>
                             </View>

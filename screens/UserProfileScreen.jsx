@@ -1,17 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {View, Text, StyleSheet, Image, Pressable, FlatList, ActivityIndicator} from 'react-native'; // Import Image from react-native
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AntDesign from "react-native-vector-icons/AntDesign";
-import Feather from "react-native-vector-icons/Feather";
 import Entypo from "react-native-vector-icons/Entypo";
-import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
-import {useNavigation} from "@react-navigation/native";
-import {useGetUserPosts} from "../hooks/useGetUserPosts";
 import {useGetUserById} from "../hooks/useGetUserById";
-import {useGetStories} from "../hooks/useGetStories";
-import {arrayUnion, doc, updateDoc, arrayRemove} from "firebase/firestore";
-import {db} from "../firebase";
-import {useAuthentication} from "../hooks/useAuthentication";
 import BackArrow from "../components/BackArrow";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import Profile from "../components/profile/Profile";

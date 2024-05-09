@@ -9,10 +9,11 @@ import LoginScreen from "../screens/LoginScreen";
 import SignupScreen from "../screens/SignupScreen";
 import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import AuthNavigation from "./AuthNavigation";
-import LoadingScreen from "../screens/LoadingScreen";
 import PostsScreen from "../screens/PostsScreen";
 import UserProfileScreen from "../screens/UserProfileScreen";
 import ConnectionsScreen from "../screens/ConnectionsScreen";
+import MessengerScreen from "../screens/MessengerScreen";
+import MessageScreen from "../screens/MessageScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator()
@@ -70,6 +71,8 @@ export const MainNavigator = () => (
         <Stack.Screen name="Posts" component={PostsScreen} />
         <Stack.Screen name="UserProfile" component={UserProfileScreen} />
         <Stack.Screen name="Connections" component={ConnectionsScreen} />
+        <Stack.Screen name="Messenger" component={MessengerScreen}/>
+        <Stack.Screen name="Message" component={MessageScreen}/>
     </Stack.Navigator>
 )
 

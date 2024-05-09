@@ -4,6 +4,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import FormikPostUpLoader from "./FormikPostUploader";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system'
+
 const AddNewPost = ({ navigation}) => {
     const [image, setImage] = useState(null);
 

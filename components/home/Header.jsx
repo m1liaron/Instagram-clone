@@ -29,7 +29,7 @@ const Header = ({navigation}) => {
                 <Pressable>
                     <AntDesign name="hearto" style={styles.icon} size={30} />
                 </Pressable>
-                <Pressable>
+                <Pressable onPress={() => navigation.navigate('Messenger')}>
                     <View style={styles.unreadBadge}>
                         <Text style={styles.unreadBadgeText}>11</Text>
                     </View>

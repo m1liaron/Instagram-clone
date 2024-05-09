@@ -4,6 +4,7 @@ import Header from "../components/home/Header";
 import Stories from "../components/home/Stories";
 import PostList from "../components/home/PostList";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import {BottomSheetComponent} from "../components/home/Post";
 
 const HomeScreen = ({navigation}) => {
     return (
@@ -11,6 +12,7 @@ const HomeScreen = ({navigation}) => {
             <Header navigation={navigation}/>
             <Stories/>
             <PostList/>
+            {/*<BottomSheetComponent/>*/}
         </SafeAreaView>
     );
 };

@@ -35,10 +35,9 @@ const Profile = ({userData}) => {
     const addGroupsToUser = () => {
         const unsubscribe = addDoc(collection(db, 'users', userData.email, 'groups'), {
             user: currentUser.username,
-            profile_picture: currentUser.profile_picture || '',
+            user_picture: userData.profile_picture,
             user_email: currentUser.email,
             owner_email: userData.email,
-            owner_uid: user.uid,
             createdAt: serverTimestamp(),
         }).then(() => {
             console.log('Add groups to user')
@@ -53,10 +52,9 @@ const Profile = ({userData}) => {
         if(!userGroups.map(item => item.user_email).includes(userData.email)) {
             const unsubscribe = addDoc(collection(db, 'users', user.email, 'groups'), {
                 user: userData.username,
-                profile_picture: currentUser.profile_picture || '',
-                user_email: user.email,
-                owner_uid: userData.uid,
-                owner_email: userData.email,
+                user_email: userData.email,
+                user_picture: currentUser.profile_picture,
+                owner_email: user.email,  // it's user that I clicked email
                 createdAt: serverTimestamp(),
             }).then(() => {
                 console.log('Add groups to user')

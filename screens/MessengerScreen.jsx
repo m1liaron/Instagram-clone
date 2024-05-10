@@ -1,52 +1,79 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, FlatList, Pressable} from 'react-native'
-import {collection, getDocs} from "firebase/firestore";
-import {db} from "../firebase";
+import React from 'react';
+import {Text, StyleSheet, FlatList, Pressable, Image, View, TextInput} from 'react-native'
 import {getAuth} from "firebase/auth";
 import {useNavigation} from "@react-navigation/native";
 import BackArrow from "../components/BackArrow";
+import {useGetUserGroups} from "../hooks/useGetUserGroups";
+import {SafeAreaView} from "react-native-safe-area-context";
+import Entypo from "react-native-vector-icons/Entypo";
 
 const MessengerScreen = () => {
-    const [userMessages, setUserMessages] = useState(null);
-
     const auth = getAuth();
     const user = auth.currentUser;
-
-    useEffect(() => {
-        const fetchGroups = async () => {
-            const querySnapshot = await getDocs(collection(db, 'users', user.email, 'groups'));
-            const posts = [];
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                data.id = doc.id;
-                posts.push(data);
-            });
-            setUserMessages(posts);
-        };
-
-        // Ensure user is logged in before fetching posts
-        if (user.email) {
-            fetchGroups();
-        }
-    }, [user.email]); // Dependency array to ensure useEffect runs when `user` changes
+    const userGroups = useGetUserGroups(user.email);
 
     const navigation = useNavigation();
 
     return (
-        <View>
-            <BackArrow/>
+        <SafeAreaView style={{flex:1, backgroundColor:'#000'}}>
+            <View>
+                <BackArrow/>
+                <View>
+                    <Text style={{color:'#fff'}}>{user.name}</Text>
+                </View>
+            </View>
+
+            <View style={styles.searchContainer}>
+                <Entypo name="magnifying-glass" size={20} color="#fff" style={{marginHorizontal:8}}/>
+                <TextInput
+                    placeholder='Шукати'
+                    placeholderTextColor="gray"
+                />
+            </View>
+
+            <View>
+                <Text style={{color:'#fff'}}>Повідомлення</Text>
+            </View>
             <FlatList
-                data={userMessages}
+                data={userGroups}
                 renderItem={({item}) => (
-                    <Pressable key={item.id} onPress={() => navigation.navigate('Message', {groupId: item.id, userEmail: item.user_email})}>
-                        <Text style={{fontSize:40}}>{item.user}</Text>
+                    <Pressable
+                        key={item.id}
+                        onPress={() => navigation.navigate('Message', {groupId: item.id, userEmail: item.user_email})}
+                        style={styles.userContainer}
+                    >
+                        <Image source={item.user_picture} style={styles.userPicture} />
+                        <Text style={{fontSize:30, color:'#fff'}}>{item.user}</Text>
                     </Pressable>
                 )
-            }/>
-        </View>
+            }
+            contentContainerStyle={styles.listContainer}/>
+        </SafeAreaView>
     );
 };
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+    userContainer:{
+        flexDirection:'row',
+        alignItems:'center'
+    },
+    userPicture: {
+        width:50,
+        height:50,
+        borderRadius:50,
+        marginRight:5
+    },
+    listContainer:{
+        marginHorizontal:20
+    },
+    searchContainer:{
+        padding:5,
+        borderRadius:5,
+        backgroundColor:'#2e2e2e',
+        flexDirection:'row',
+        alignItems:'center',
+        margin:15,
+    }
+})
 
 export default MessengerScreen;

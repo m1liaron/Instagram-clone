@@ -63,9 +63,10 @@ export const MainNavigator = () => (
     <Stack.Navigator
         initialRouteName="Home"
         screenOptions={{
-            headerShown: false
+            headerShown: false,
+            gestureEnabled: true,
+            gestureDirection: 'horizontal',
         }}
-
     >
         <Stack.Screen name="Home" component={AuthNavigation} />
         <Stack.Screen name="Posts" component={PostsScreen} />

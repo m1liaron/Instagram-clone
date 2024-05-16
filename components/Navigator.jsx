@@ -14,6 +14,7 @@ import UserProfileScreen from "../screens/UserProfileScreen";
 import ConnectionsScreen from "../screens/ConnectionsScreen";
 import MessengerScreen from "../screens/MessengerScreen";
 import MessageScreen from "../screens/MessageScreen";
+import VideoCallScreen from "../screens/VideoCallScreen";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator()
@@ -74,6 +75,7 @@ export const MainNavigator = () => (
         <Stack.Screen name="Connections" component={ConnectionsScreen} />
         <Stack.Screen name="Messenger" component={MessengerScreen}/>
         <Stack.Screen name="Message" component={MessageScreen}/>
+        <Stack.Screen name="VideoCall" component={VideoCallScreen}/>
     </Stack.Navigator>
 )
 
